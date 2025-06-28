@@ -1,49 +1,52 @@
-// frontend/src/components/Layout/Navbar.jsx
-import { Link, useNavigate } from 'react-router-dom';
+// src/components/common/Navbar.jsx
+import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import ThemeToggle from './ThemeToggle';
+import { useTheme } from '../../context/ThemeContext';
 
 const Navbar = () => {
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
+  const { user, logout, isAuthenticated } = useAuth();
+  const { theme, toggleTheme } = useTheme();
 
   return (
     <nav className="navbar">
       <div className="container">
-        <div className="nav-container">
-          <Link to="/" style={{ fontSize: '20px', fontWeight: 'bold', textDecoration: 'none', color: 'var(--text-primary)' }}>
+        <div className="navbar-content">
+          <Link to="/" className="navbar-brand">
             EventPlanner
           </Link>
           
-          {user ? (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-              <ul className="nav-links">
-                <li><Link to="/events" className="nav-link">Events</Link></li>
-                <li><Link to="/past-events" className="nav-link">Past Events</Link></li>
-                <li><Link to="/create-event" className="nav-link">Create Event</Link></li>
-              </ul>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <span>Hello, {user.username}</span>
-                <button className="btn btn-secondary" onClick={handleLogout}>Logout</button>
-                <ThemeToggle />
-              </div>
-            </div>
+          {isAuthenticated ? (
+            <ul className="navbar-nav">
+              <li><Link to="/events">Events</Link></li>
+              <li><Link to="/past-events">Past Events</Link></li>
+              <li><Link to="/create-event">Create Event</Link></li>
+              <li>
+                <button className="theme-toggle" onClick={toggleTheme}>
+                  {theme === 'light' ? '🌙' : '☀️'}
+                </button>
+              </li>
+              <li>
+                <span>Hi, {user?.username}!</span>
+              </li>
+              <li>
+                <button className="btn btn-outline" onClick={logout}>
+                  Logout
+                </button>
+              </li>
+            </ul>
           ) : (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <Link to="/login" className="btn btn-primary">Login</Link>
-              <Link to="/register" className="btn btn-secondary">Register</Link>
-              <ThemeToggle />
-            </div>
+            <ul className="navbar-nav">
+              <li>
+                <button className="theme-toggle" onClick={toggleTheme}>
+                  {theme === 'light' ? '🌙' : '☀️'}
+                </button>
+              </li>
+              <li><Link to="/login">Login</Link></li>
+              <li><Link to="/register">Register</Link></li>
+            </ul>
           )}
         </div>
       </div>
     </nav>
   );
 };
-
-export default Navbar;
