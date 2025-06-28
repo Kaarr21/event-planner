@@ -12,8 +12,7 @@ const EventSchema = Yup.object().shape({
     .required('Title is required'),
   description: Yup.string()
     .max(500, 'Description must be less than 500 characters'),
-  date: Yup.date()
-    .min(new Date(), 'Event date must be in the future')
+  date: Yup.string()
     .required('Date is required'),
   location: Yup.string()
     .max(200, 'Location must be less than 200 characters'),
@@ -43,9 +42,10 @@ const EventForm = () => {
 
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
+      // Convert datetime-local format to ISO string
       const eventData = {
         ...values,
-        date: new Date(values.date).toISOString(),
+        date: values.date, // Send as-is, backend will handle parsing
       };
 
       if (isEditing) {

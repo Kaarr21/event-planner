@@ -30,7 +30,7 @@ const TaskForm = ({ eventId, task, onTaskCreated, onTaskUpdated, onCancel }) => 
         response = await tasksAPI.updateTask(task.id, taskData);
         onTaskUpdated && onTaskUpdated(response.data);
       } else {
-        response = await tasksAPI.createTask(taskData);
+        response = await tasksAPI.createTask(eventId, taskData);
         onTaskCreated && onTaskCreated(response.data);
       }
       

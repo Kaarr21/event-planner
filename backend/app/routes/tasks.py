@@ -16,24 +16,43 @@ def get_event_tasks(event_id):
 @tasks_bp.route('/event/<int:event_id>', methods=['POST'])
 @jwt_required_custom
 def create_task(event_id):
-    event = Event.query.get_or_404(event_id)
-    current_user = get_current_user()
-    
-    if event.user_id != current_user.id:
-        return jsonify({'message': 'Unauthorized'}), 403
-    
-    data = request.get_json()
-    task = Task(
-        title=data['title'],
-        description=data.get('description'),
-        due_date=datetime.fromisoformat(data['due_date']) if data.get('due_date') else None,
-        event_id=event_id
-    )
-    
-    db.session.add(task)
-    db.session.commit()
-    
-    return jsonify(task.to_dict()), 201
+    try:
+        event = Event.query.get_or_404(event_id)
+        current_user = get_current_user()
+        
+        if not current_user:
+            return jsonify({'message': 'User not found'}), 404
+        
+        if event.user_id != current_user.id:
+            return jsonify({'message': 'Unauthorized'}), 403
+        
+        data = request.get_json()
+        
+        if not data.get('title'):
+            return jsonify({'message': 'Title is required'}), 400
+        
+        # Parse due_date if provided
+        due_date = None
+        if data.get('due_date'):
+            try:
+                due_date = datetime.fromisoformat(data['due_date'])
+            except (ValueError, TypeError):
+                return jsonify({'message': 'Invalid due date format'}), 400
+        
+        task = Task(
+            title=data['title'],
+            description=data.get('description'),
+            due_date=due_date,
+            event_id=event_id
+        )
+        
+        db.session.add(task)
+        db.session.commit()
+        
+        return jsonify(task.to_dict()), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'message': f'Error creating task: {str(e)}'}), 500
 
 @tasks_bp.route('/<int:task_id>', methods=['PUT'])
 @jwt_required_custom

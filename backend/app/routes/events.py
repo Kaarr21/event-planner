@@ -22,21 +22,50 @@ def get_past_events():
 @events_bp.route('', methods=['POST'])
 @jwt_required_custom
 def create_event():
-    data = request.get_json()
-    current_user = get_current_user()
-    
-    event = Event(
-        title=data['title'],
-        description=data.get('description'),
-        date=datetime.fromisoformat(data['date']),
-        location=data.get('location'),
-        user_id=current_user.id
-    )
-    
-    db.session.add(event)
-    db.session.commit()
-    
-    return jsonify(event.to_dict()), 201
+    try:
+        data = request.get_json()
+        current_user = get_current_user()
+        
+        if not current_user:
+            return jsonify({'message': 'User not found'}), 404
+        
+        # Validate required fields
+        if not data.get('title'):
+            return jsonify({'message': 'Title is required'}), 400
+        if not data.get('date'):
+            return jsonify({'message': 'Date is required'}), 400
+        
+        # Parse date with better error handling
+        try:
+            date_str = data['date']
+            # Handle different date formats
+            if 'T' in date_str and not date_str.endswith('Z'):
+                # datetime-local format from HTML input
+                event_date = datetime.fromisoformat(date_str)
+            elif date_str.endswith('Z'):
+                # ISO format with Z
+                event_date = datetime.fromisoformat(date_str.replace('Z', '+00:00'))
+            else:
+                # Try parsing as-is
+                event_date = datetime.fromisoformat(date_str)
+        except (ValueError, TypeError) as e:
+            return jsonify({'message': f'Invalid date format: {str(e)}'}), 400
+        
+        event = Event(
+            title=data['title'],
+            description=data.get('description'),
+            date=event_date,
+            location=data.get('location'),
+            user_id=current_user.id
+        )
+        
+        db.session.add(event)
+        db.session.commit()
+        
+        return jsonify(event.to_dict()), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'message': f'Error creating event: {str(e)}'}), 500
 
 @events_bp.route('/<int:event_id>', methods=['GET'])
 @jwt_required_custom
@@ -59,7 +88,20 @@ def update_event(event_id):
     event.location = data.get('location', event.location)
     
     if 'date' in data:
-        event.date = datetime.fromisoformat(data['date'])
+        try:
+            date_str = data['date']
+            # Handle different date formats
+            if 'T' in date_str and not date_str.endswith('Z'):
+                # datetime-local format from HTML input
+                event.date = datetime.fromisoformat(date_str)
+            elif date_str.endswith('Z'):
+                # ISO format with Z
+                event.date = datetime.fromisoformat(date_str.replace('Z', '+00:00'))
+            else:
+                # Try parsing as-is
+                event.date = datetime.fromisoformat(date_str)
+        except (ValueError, TypeError):
+            return jsonify({'message': 'Invalid date format'}), 400
     
     db.session.commit()
     return jsonify(event.to_dict())
