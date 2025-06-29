@@ -2,15 +2,26 @@
 from flask import Blueprint, request, jsonify
 from datetime import datetime
 from app import db
-from app.models import Task, Event
+from app.models import Task, Event, Invite
 from app.utils import jwt_required_custom, get_current_user
 
 tasks_bp = Blueprint('tasks', __name__)
 
-@tasks_bp.route('/event/<int:event_id>', methods=['GET'])
+@tasks_bp.route('/event/cint:event_ide', methods=['GET'])
 @jwt_required_custom
 def get_event_tasks(event_id):
+    current_user = get_current_user()
     event = Event.query.get_or_404(event_id)
+    
+    # Check if user is the creator OR has been invited to this event
+    if event.user_id != current_user.id:
+        invite = Invite.query.filter_by(
+            event_id=event_id, 
+            invitee_id=current_user.id
+        ).first()
+        if not invite:
+            return jsonify({'message': 'Unauthorized - you are not invited to this event'}), 403
+    
     return jsonify([task.to_dict() for task in event.tasks])
 
 @tasks_bp.route('/event/<int:event_id>', methods=['POST'])

@@ -1,6 +1,6 @@
 // frontend/src/components/Auth/Login.jsx
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { useAuth } from '../../context/AuthContext';
@@ -19,6 +19,8 @@ const Login = () => {
   const [error, setError] = useState('');
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const successMessage = location.state?.message;
 
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
@@ -35,6 +37,12 @@ const Login = () => {
     <div className="container" style={{ maxWidth: '400px', marginTop: '50px' }}>
       <div className="card">
         <h2 style={{ textAlign: 'center', marginBottom: '30px' }}>Login</h2>
+        
+        {successMessage && (
+          <div style={{ color: 'var(--success)', marginBottom: '20px', textAlign: 'center' }}>
+            {successMessage}
+          </div>
+        )}
         
         {error && (
           <div style={{ color: 'var(--danger)', marginBottom: '20px', textAlign: 'center' }}>

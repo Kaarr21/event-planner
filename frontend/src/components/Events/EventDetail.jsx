@@ -5,6 +5,7 @@ import { eventsAPI, tasksAPI, rsvpAPI } from '../../utils/api';
 import TaskList from '../Tasks/TaskList';
 import TaskForm from '../Tasks/TaskForm';
 import RSVPForm from '../RSVP/RSVPForm';
+import InviteForm from '../Invites/InviteForm';
 import LoadingSpinner from '../common/LoadingSpinner';
 
 const EventDetail = () => {
@@ -14,7 +15,9 @@ const EventDetail = () => {
   const [loading, setLoading] = useState(true);
   const [showTaskForm, setShowTaskForm] = useState(false);
   const [showRSVPForm, setShowRSVPForm] = useState(false);
+  const [showInviteForm, setShowInviteForm] = useState(false);
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const { id } = useParams();
 
   useEffect(() => {
@@ -63,12 +66,20 @@ const EventDetail = () => {
     setShowRSVPForm(false);
   };
 
+  const handleInviteSent = (newInvite) => {
+    setSuccessMessage(`Invite sent to ${newInvite.invitee_email}!`);
+    setShowInviteForm(false);
+    // Clear success message after 3 seconds
+    setTimeout(() => setSuccessMessage(''), 3000);
+  };
+
   if (loading) return <LoadingSpinner />;
   if (!event) return <div>Event not found</div>;
 
   return (
     <div className="container" style={{ marginTop: '30px' }}>
       {error && <div style={{ color: 'var(--danger)', marginBottom: '20px' }}>{error}</div>}
+      {successMessage && <div style={{ color: 'var(--success)', marginBottom: '20px' }}>{successMessage}</div>}
       
       <div className="card">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '20px' }}>
@@ -79,7 +90,15 @@ const EventDetail = () => {
             </p>
             {event.location && <p>📍 {event.location}</p>}
           </div>
-          <Link to={`/events/${event.id}/edit`} className="btn btn-secondary">Edit Event</Link>
+          <div style={{ display: 'flex', gap: '10px' }}>
+            <button 
+              className="btn btn-primary"
+              onClick={() => setShowInviteForm(!showInviteForm)}
+            >
+              {showInviteForm ? 'Cancel' : 'Invite People'}
+            </button>
+            <Link to={`/events/${event.id}/edit`} className="btn btn-secondary">Edit Event</Link>
+          </div>
         </div>
         
         <p>{event.description}</p>
@@ -87,6 +106,14 @@ const EventDetail = () => {
           Created by {event.creator}
         </div>
       </div>
+
+      {showInviteForm && (
+        <InviteForm 
+          eventId={id} 
+          onInviteSent={handleInviteSent}
+          onCancel={() => setShowInviteForm(false)}
+        />
+      )}
 
       <div className="grid grid-2">
         <div>

@@ -23,11 +23,15 @@ def create_app():
     from app.routes.events import events_bp
     from app.routes.tasks import tasks_bp
     from app.routes.rsvps import rsvps_bp
+    from app.routes.invites import invites_bp
+    from app.routes.profile import profile_bp
     
     app.register_blueprint(auth_bp, url_prefix='/auth')
     app.register_blueprint(events_bp, url_prefix='/events')
     app.register_blueprint(tasks_bp, url_prefix='/tasks')
     app.register_blueprint(rsvps_bp, url_prefix='/rsvps')
+    app.register_blueprint(invites_bp, url_prefix='/invites')
+    app.register_blueprint(profile_bp, url_prefix='/profile')
     
     return app
     

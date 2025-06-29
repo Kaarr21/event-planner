@@ -43,6 +43,7 @@ export const authAPI = {
 export const eventsAPI = {
   getEvents: () => api.get('/events'),
   getPastEvents: () => api.get('/events/past'),
+  getInvitedEvents: () => api.get('/events/invited'),
   getEvent: (id) => api.get(`/events/${id}`),
   createEvent: (eventData) => api.post('/events', eventData),
   updateEvent: (id, eventData) => api.put(`/events/${id}`, eventData),
@@ -59,6 +60,26 @@ export const tasksAPI = {
 export const rsvpAPI = {
   getEventRSVPs: (eventId) => api.get(`/rsvps/event/${eventId}`),
   createRSVP: (eventId, rsvpData) => api.post(`/rsvps/event/${eventId}`, rsvpData),
+};
+
+export const inviteAPI = {
+  sendInvite: (eventId, inviteData) => api.post(`/events/${eventId}/invite`, inviteData),
+  getUserInvites: () => api.get('/invites'),
+  respondToInvite: (inviteId, responseData) => api.post(`/invites/${inviteId}/respond`, responseData),
+  cancelInvite: (inviteId) => api.delete(`/invites/${inviteId}/cancel`),
+  getSentInvites: () => api.get('/invites/sent'),
+};
+
+export const notificationAPI = {
+  getNotifications: () => api.get('/rsvps/notifications'),
+  markAsRead: (notificationId) => api.put(`/rsvps/notifications/${notificationId}/read`),
+};
+
+export const profileAPI = {
+  getProfile: () => api.get('/profile'),
+  updateProfile: (profileData) => api.put('/profile', profileData),
+  changePassword: (passwordData) => api.put('/profile/change-password', passwordData),
+  deleteAccount: () => api.delete('/profile/delete'),
 };
 
 export default api;

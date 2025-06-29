@@ -8,6 +8,8 @@ import EventList from './components/Events/EventList';
 import EventDetail from './components/Events/EventDetail';
 import EventForm from './components/Events/EventForm';
 import PastEvents from './components/Events/PastEvents';
+import Notifications from './components/Notifications/Notifications';
+import Profile from './components/Profile/Profile';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import './App.css';
 
@@ -45,6 +47,16 @@ function App() {
               <Route path="/past-events" element={
                 <ProtectedRoute>
                   <PastEvents />
+                </ProtectedRoute>
+              } />
+              <Route path="/notifications" element={
+                <ProtectedRoute>
+                  <Notifications />
+                </ProtectedRoute>
+              } />
+              <Route path="/profile" element={
+                <ProtectedRoute>
+                  <Profile />
                 </ProtectedRoute>
               } />
             </Routes>

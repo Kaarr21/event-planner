@@ -91,3 +91,59 @@ class RSVP(db.Model):
             'message': self.message,
             'created_at': self.created_at.isoformat()
         }
+
+class Invite(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)
+    inviter_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    invitee_email = db.Column(db.String(120), nullable=False)
+    invitee_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)  # Will be set when email is found
+    status = db.Column(db.String(20), default='pending')  # pending, accepted, declined
+    message = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    responded_at = db.Column(db.DateTime)
+    
+    # Relationships
+    event = db.relationship('Event', backref='invites')
+    inviter = db.relationship('User', foreign_keys=[inviter_id], backref='sent_invites')
+    invitee = db.relationship('User', foreign_keys=[invitee_id], backref='received_invites')
+    
+    __table_args__ = (db.UniqueConstraint('event_id', 'invitee_email', name='unique_event_invitee'),)
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'event_id': self.event_id,
+            'event_title': self.event.title,
+            'event_date': self.event.date.isoformat(),
+            'inviter': self.inviter.username,
+            'invitee_email': self.invitee_email,
+            'invitee': self.invitee.username if self.invitee else None,
+            'status': self.status,
+            'message': self.message,
+            'created_at': self.created_at.isoformat(),
+            'responded_at': self.responded_at.isoformat() if self.responded_at else None
+        }
+
+class Notification(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    type = db.Column(db.String(50), nullable=False)  # invite, rsvp_update, etc.
+    title = db.Column(db.String(200), nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    related_id = db.Column(db.Integer)  # Could be invite_id, event_id, etc.
+    read = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    user = db.relationship('User', backref='notifications')
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'type': self.type,
+            'title': self.title,
+            'message': self.message,
+            'related_id': self.related_id,
+            'read': self.read,
+            'created_at': self.created_at.isoformat()
+        }
