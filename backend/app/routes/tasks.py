@@ -7,7 +7,7 @@ from app.utils import jwt_required_custom, get_current_user
 
 tasks_bp = Blueprint('tasks', __name__)
 
-@tasks_bp.route('/event/cint:event_ide', methods=['GET'])
+@tasks_bp.route('/event/<int:event_id>', methods=['GET'])
 @jwt_required_custom
 def get_event_tasks(event_id):
     current_user = get_current_user()

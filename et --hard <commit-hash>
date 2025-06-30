@@ -1,0 +1,44 @@
+[33m50aaf4b[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m Initial
+[33m0a7b539[m Init
+[33m17371ae[m Init
+[33mf53ca24[m Init
+[33m0bd0c24[m Init
+[33m1968958[m Init
+[33m41f0448[m Init
+[33m0b29ae4[m Init
+[33maea83b0[m Init
+[33mcf27582[m Init
+[33m780a86e[m Init
+[33mfd002c8[m Init
+[33m0a1ddf5[m Init
+[33ma0f82ba[m Init
+[33mc577299[m Init
+[33mc4df50e[m Init
+[33m5651bbe[m Init
+[33mdb0ed53[m Init
+[33me043954[m Init
+[33m7bf9126[m Init
+[33m2f7c264[m Init
+[33m9ceecf5[m Init
+[33m4bc72f1[m Init
+[33md2bd61a[m Init
+[33m2a28638[m Init
+[33m0fdc73f[m Init
+[33m167ec5e[m Init
+[33m18b547d[m more bugs
+[33m9002431[m Bugs
+[33m4725f5f[m Fix frontend API configuration for production
+[33md49b0a1[m Fix corrupted route definitions and frontend API configuration
+[33m7e40a87[m Initial
+[33m7e9cc19[m CORS
+[33md1ef963[m app.py
+[33mea5dc79[m Requirements.txt
+[33m53ea3f4[m Profile
+[33m7019c51[m UI
+[33m29899c8[m UI
+[33m2ac1c4b[m Git ignore
+[33m82fb8a6[m Bugs
+[33mf8b30c3[m Initial
+[33md80fe19[m frontend
+[33mffd0c20[m backend
+[33ma96cb45[m first commit
