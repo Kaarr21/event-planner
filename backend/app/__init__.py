@@ -10,10 +10,6 @@ db = SQLAlchemy()
 migrate = Migrate()
 jwt = JWTManager()
 
-@app.before_first_request
-def create_tables():
-    db.create_all()
-
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
@@ -22,6 +18,10 @@ def create_app():
     migrate.init_app(app, db)
     CORS(app)
     jwt.init_app(app)
+
+    @app.before_first_request
+    def create_tables():
+        db.create_all()
     
     from app.routes.auth import auth_bp
     from app.routes.events import events_bp
