@@ -18,8 +18,8 @@ def create_app():
     CORS(app)
     jwt.init_app(app)
     
-    with app.app_context():
-        db.create_all()
+    #with app.app_context():
+     #   db.create_all()
     
     from app.routes.auth import auth_bp
     from app.routes.events import events_bp
