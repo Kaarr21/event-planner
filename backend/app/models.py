@@ -4,6 +4,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 
 class User(db.Model):
+    __tablename__ = 'users'  # ✅ Avoid PostgreSQL reserved keyword conflict
+
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
@@ -12,6 +14,9 @@ class User(db.Model):
     
     events = db.relationship('Event', backref='creator', lazy=True)
     rsvps = db.relationship('RSVP', backref='user', lazy=True)
+    sent_invites = db.relationship('Invite', foreign_keys='Invite.inviter_id', backref='inviter', lazy=True)
+    received_invites = db.relationship('Invite', foreign_keys='Invite.invitee_id', backref='invitee', lazy=True)
+    notifications = db.relationship('Notification', backref='user', lazy=True)
     
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -34,11 +39,12 @@ class Event(db.Model):
     date = db.Column(db.DateTime, nullable=False)
     location = db.Column(db.String(200))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # updated
+
     tasks = db.relationship('Task', backref='event', lazy=True, cascade='all, delete-orphan')
     rsvps = db.relationship('RSVP', backref='event', lazy=True, cascade='all, delete-orphan')
-    
+    invites = db.relationship('Invite', backref='event', lazy=True)
+
     def to_dict(self):
         return {
             'id': self.id,
@@ -60,7 +66,7 @@ class Task(db.Model):
     due_date = db.Column(db.DateTime)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)
-    
+
     def to_dict(self):
         return {
             'id': self.id,
@@ -74,14 +80,14 @@ class Task(db.Model):
 
 class RSVP(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # updated
     event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)
     status = db.Column(db.String(20), nullable=False)
     message = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    
+
     __table_args__ = (db.UniqueConstraint('user_id', 'event_id', name='unique_user_event_rsvp'),)
-    
+
     def to_dict(self):
         return {
             'id': self.id,
@@ -95,21 +101,16 @@ class RSVP(db.Model):
 class Invite(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)
-    inviter_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    inviter_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # updated
     invitee_email = db.Column(db.String(120), nullable=False)
-    invitee_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)  # Will be set when email is found
+    invitee_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)  # updated
     status = db.Column(db.String(20), default='pending')  # pending, accepted, declined
     message = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     responded_at = db.Column(db.DateTime)
-    
-    # Relationships
-    event = db.relationship('Event', backref='invites')
-    inviter = db.relationship('User', foreign_keys=[inviter_id], backref='sent_invites')
-    invitee = db.relationship('User', foreign_keys=[invitee_id], backref='received_invites')
-    
+
     __table_args__ = (db.UniqueConstraint('event_id', 'invitee_email', name='unique_event_invitee'),)
-    
+
     def to_dict(self):
         return {
             'id': self.id,
@@ -127,16 +128,14 @@ class Invite(db.Model):
 
 class Notification(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # updated
     type = db.Column(db.String(50), nullable=False)  # invite, rsvp_update, etc.
     title = db.Column(db.String(200), nullable=False)
     message = db.Column(db.Text, nullable=False)
     related_id = db.Column(db.Integer)  # Could be invite_id, event_id, etc.
     read = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    
-    user = db.relationship('User', backref='notifications')
-    
+
     def to_dict(self):
         return {
             'id': self.id,
