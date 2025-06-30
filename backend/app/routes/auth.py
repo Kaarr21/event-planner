@@ -8,25 +8,41 @@ auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route('/register', methods=['POST'])
 def register():
-    data = request.get_json()
-    
-    if User.query.filter_by(username=data['username']).first():
-        return jsonify({'message': 'Username already exists'}), 400
-    
-    if User.query.filter_by(email=data['email']).first():
-        return jsonify({'message': 'Email already exists'}), 400
-    
-    user = User(username=data['username'], email=data['email'])
-    user.set_password(data['password'])
-    
-    db.session.add(user)
-    db.session.commit()
-    
-    access_token = create_access_token(identity=user.id)
-    return jsonify({
-        'access_token': access_token,
-        'user': user.to_dict()
-    }), 201
+    try:
+        data = request.get_json()
+
+        if not data:
+            return jsonify({'message': 'No data provided'}), 400
+
+        username = data.get('username')
+        email = data.get('email')
+        password = data.get('password')
+
+        if not username or not email or not password:
+            return jsonify({'message': 'Username, email, and password are required'}), 400
+
+        if User.query.filter_by(username=username).first():
+            return jsonify({'message': 'Username already exists'}), 400
+
+        if User.query.filter_by(email=email).first():
+            return jsonify({'message': 'Email already exists'}), 400
+
+        user = User(username=username, email=email)
+        user.set_password(password)
+
+        db.session.add(user)
+        db.session.commit()
+
+        access_token = create_access_token(identity=user.id)
+        return jsonify({
+            'access_token': access_token,
+            'user': user.to_dict()
+        }), 201
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'message': 'Internal server error', 'error': str(e)}), 500
+
 
 @auth_bp.route('/login', methods=['POST'])
 def login():
