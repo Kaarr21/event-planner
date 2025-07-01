@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: event-planner-backend
+    env: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn 'app:create_app()' --chdir backend --bind 0.0.0.0:$PORT --timeout 120 --log-level info"
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      - key: FLASK_ENV
+        value: production
+      - key: DATABASE_URI
+        fromDatabase:
+          name: event-planner-db
+          property: connectionString
+
+databases:
+  - name: event-planner-db
+    databaseName: event_planner
+    user: event_planner_user

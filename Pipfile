@@ -11,6 +11,10 @@ flask-sqlalchemy = "*"
 flask-migrate = "*"
 sqlalchemy-serializer = "*"
 flask-restful = "*"
+honcho = "*"
+python-dotenv = "*"
+flask-cors = "*"
+flask-jwt-extended = "*"
 
 [dev-packages]
 
