@@ -1,9 +1,8 @@
 # backend/app/routes/invites.py
 from flask import Blueprint, request, jsonify
 from datetime import datetime
-from app import db
-from app.models import Invite, User, Event, Notification
-from app.utils import jwt_required_custom, get_current_user
+from .. models import db, Invite, User, Event, Notification
+from ..utils import jwt_required_custom, get_current_user
 
 invites_bp = Blueprint('invites', __name__)
 

@@ -1,9 +1,9 @@
 # backend/app/routes/tasks.py
 from flask import Blueprint, request, jsonify
 from datetime import datetime
-from app import db
-from app.models import Task, Event, Invite
-from app.utils import jwt_required_custom, get_current_user
+from .. import db
+from .. models import Task, Event, Invite
+from .. utils import jwt_required_custom, get_current_user
 
 tasks_bp = Blueprint('tasks', __name__)
 

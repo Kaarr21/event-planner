@@ -1,8 +1,8 @@
 # backend/app/routes/profile.py
 from flask import Blueprint, request, jsonify
-from app import db
-from app.models import User
-from app.utils import jwt_required_custom, get_current_user
+from .. import db
+from .. models import User
+from .. utils import jwt_required_custom, get_current_user
 
 profile_bp = Blueprint('profile', __name__)
 

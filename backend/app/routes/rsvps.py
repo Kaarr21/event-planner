@@ -1,8 +1,8 @@
 # backend/app/routes/rsvps.py
 from flask import Blueprint, request, jsonify
-from app import db
-from app.models import RSVP, Event, Notification, Invite
-from app.utils import jwt_required_custom, get_current_user
+from .. import db
+from .. models import RSVP, Event, Notification, Invite
+from .. utils import jwt_required_custom, get_current_user
 
 rsvps_bp = Blueprint('rsvps', __name__)
 

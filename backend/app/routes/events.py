@@ -1,9 +1,9 @@
 # backend/app/routes/events.py
 from flask import Blueprint, request, jsonify
 from datetime import datetime
-from app import db
-from app.models import Event, User, Invite, Notification
-from app.utils import jwt_required_custom, get_current_user
+from .. import db
+from ..models import Event, User, Invite, Notification
+from ..utils import jwt_required_custom, get_current_user
 
 events_bp = Blueprint('events', __name__)
 
