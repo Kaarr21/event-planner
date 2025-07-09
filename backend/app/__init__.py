@@ -40,7 +40,8 @@ def create_app():
     def health_check():
         try:
             # Test database connection
-            db.engine.execute('SELECT 1')
+            with db.engine.connect() as conn:
+                conn.execute(db.text('SELECT 1'))
             return {'status': 'healthy', 'database': 'connected'}
         except Exception as e:
             return {'status': 'unhealthy', 'error': str(e)}, 500

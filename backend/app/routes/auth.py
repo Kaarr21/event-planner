@@ -7,10 +7,22 @@ import traceback
 
 auth_bp = Blueprint('auth', __name__)
 
+@auth_bp.route('/test-db', methods=['GET'])
+def test_db():
+    try:
+        # Test basic database query
+        users = User.query.all()
+        return jsonify({'message': 'Database working', 'user_count': len(users)})
+    except Exception as e:
+        print(f"Database test error: {e}")
+        return jsonify({'message': 'Database error', 'error': str(e)}), 500
+
 @auth_bp.route('/register', methods=['POST'])
 def register():
     try:
+        print("Registration attempt started")
         data = request.get_json()
+        print(f"Received data: {data}")
         
         if not data:
             return jsonify({'message': 'No data provided'}), 400
@@ -18,17 +30,24 @@ def register():
         if 'username' not in data or 'email' not in data or 'password' not in data:
             return jsonify({'message': 'Missing required fields'}), 400
         
-        if User.query.filter_by(username=data['username']).first():
+        print(f"Checking if username {data['username']} exists...")
+        existing_user = User.query.filter_by(username=data['username']).first()
+        if existing_user:
             return jsonify({'message': 'Username already exists'}), 400
         
-        if User.query.filter_by(email=data['email']).first():
+        print(f"Checking if email {data['email']} exists...")
+        existing_email = User.query.filter_by(email=data['email']).first()
+        if existing_email:
             return jsonify({'message': 'Email already exists'}), 400
         
+        print("Creating new user...")
         user = User(username=data['username'], email=data['email'])
         user.set_password(data['password'])
         
+        print("Adding user to database...")
         db.session.add(user)
         db.session.commit()
+        print("User created successfully")
         
         access_token = create_access_token(identity=user.id)
         return jsonify({
@@ -39,6 +58,7 @@ def register():
     except Exception as e:
         print(f"Error in register: {e}")
         print(traceback.format_exc())
+        db.session.rollback()
         return jsonify({'message': 'Internal server error', 'error': str(e)}), 500
 
 @auth_bp.route('/login', methods=['POST'])
