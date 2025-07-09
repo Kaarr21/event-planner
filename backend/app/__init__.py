@@ -35,6 +35,16 @@ def create_app():
     app.register_blueprint(invites_bp, url_prefix='/api/invites')
     app.register_blueprint(profile_bp, url_prefix='/api/profile')
     
+    # Health check endpoint
+    @app.route('/api/health')
+    def health_check():
+        try:
+            # Test database connection
+            db.engine.execute('SELECT 1')
+            return {'status': 'healthy', 'database': 'connected'}
+        except Exception as e:
+            return {'status': 'unhealthy', 'error': str(e)}, 500
+    
     # Serve React app
     @app.route('/')
     def serve_react_app():
