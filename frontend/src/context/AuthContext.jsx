@@ -19,6 +19,9 @@ export const AuthProvider = ({ children }) => {
     const token = localStorage.getItem('token');
     const userData = localStorage.getItem('user');
     
+    console.log('AuthContext: Loaded token:', token ? token.substring(0, 10) + '...' : 'None');
+    console.log('AuthContext: Loaded user:', userData);
+
     if (token && userData) {
       setUser(JSON.parse(userData));
     }
@@ -26,18 +29,22 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = (token, userData) => {
+    console.log('AuthContext: Storing token:', token ? token.substring(0, 10) + '...' : 'None');
+    console.log('AuthContext: Storing user:', userData);
     localStorage.setItem('token', token);
     localStorage.setItem('user', JSON.stringify(userData));
     setUser(userData);
   };
 
   const logout = () => {
+    console.log('AuthContext: Logging out');
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     setUser(null);
   };
 
   const updateUser = (userData) => {
+    console.log('AuthContext: Updating user:', userData);
     localStorage.setItem('user', JSON.stringify(userData));
     setUser(userData);
   };

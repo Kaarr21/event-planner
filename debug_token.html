@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Token Debug</title>
+</head>
+<body>
+    <h1>Token Debug</h1>
+    <button onclick="checkToken()">Check Token</button>
+    <button onclick="testAPI()">Test API Call</button>
+    <button onclick="registerTest()">Register Test User</button>
+    <div id="output"></div>
+    
+    <script>
+        function log(message) {
+            const output = document.getElementById('output');
+            output.innerHTML += '<p>' + message + '</p>';
+        }
+        
+        function checkToken() {
+            const token = localStorage.getItem('token');
+            const user = localStorage.getItem('user');
+            log('Token: ' + (token ? 'Present (' + token.length + ' chars)' : 'Missing'));
+            log('User: ' + (user ? JSON.stringify(JSON.parse(user)) : 'Missing'));
+        }
+        
+        async function testAPI() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                log('No token found');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/events', {
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                log('API Response: ' + response.status + ' - ' + JSON.stringify(data));
+            } catch (error) {
+                log('API Error: ' + error.message);
+            }
+        }
+        
+        async function registerTest() {
+            try {
+                const response = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: 'testuser' + Date.now(),
+                        email: 'test' + Date.now() + '@example.com',
+                        password: 'testpass123'
+                    })
+                });
+                
+                const data = await response.json();
+                log('Register Response: ' + response.status + ' - ' + JSON.stringify(data));
+                
+                if (data.access_token) {
+                    localStorage.setItem('token', data.access_token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    log('Token stored successfully');
+                }
+            } catch (error) {
+                log('Register Error: ' + error.message);
+            }
+        }
+    </script>
+</body>
+</html>
