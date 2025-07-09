@@ -12,7 +12,18 @@ def test_db():
     try:
         # Test basic database query
         users = User.query.all()
-        return jsonify({'message': 'Database working', 'user_count': len(users)})
+        
+        # Check table structure
+        from sqlalchemy import inspect
+        inspector = inspect(db.engine)
+        columns = inspector.get_columns('user')
+        password_hash_col = next((col for col in columns if col['name'] == 'password_hash'), None)
+        
+        return jsonify({
+            'message': 'Database working', 
+            'user_count': len(users),
+            'password_hash_column_length': password_hash_col['type'].length if password_hash_col else 'Unknown'
+        })
     except Exception as e:
         print(f"Database test error: {e}")
         return jsonify({'message': 'Database error', 'error': str(e)}), 500

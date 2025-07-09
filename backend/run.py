@@ -7,6 +7,9 @@ app = create_app()
 # Initialize database tables
 with app.app_context():
     try:
+        # Force table recreation to apply schema changes
+        print("Dropping and recreating tables...")
+        db.drop_all()
         db.create_all()
         print("Database tables created successfully")
     except Exception as e:
