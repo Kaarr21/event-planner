@@ -4,6 +4,12 @@
 set -e  # Exit on any error
 
 echo "=== Starting build process ==="
+echo "Python version: $(python --version)"
+echo "Pip version: $(pip --version)"
+
+# Upgrade pip first
+echo "Upgrading pip..."
+pip install --upgrade pip
 
 # Install Python dependencies
 echo "Installing Python dependencies..."
