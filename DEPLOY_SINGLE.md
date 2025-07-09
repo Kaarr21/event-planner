@@ -7,6 +7,8 @@ This guide will help you deploy your Event Planner app as a single service on Re
 1. **Combined Frontend + Backend**: Flask now serves both the API endpoints (under `/api/`) and the React frontend as static files
 2. **Build Process**: The build script installs dependencies for both Python and Node.js, then builds the React app
 3. **Single Service**: Everything runs as one web service, making it free tier compatible
+4. **Fixed Python Version**: Uses Python 3.11.9 to avoid compatibility issues
+5. **Modern PostgreSQL Driver**: Uses psycopg3 which is compatible with newer Python versions
 
 ## Deployment Steps
 
@@ -14,7 +16,7 @@ This guide will help you deploy your Event Planner app as a single service on Re
 
 ```bash
 git add .
-git commit -m "Configure for single service Render deployment"
+git commit -m "Fix Python version and PostgreSQL driver compatibility"
 git push origin main
 ```
 
