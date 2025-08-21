@@ -60,7 +60,8 @@ def register():
         db.session.commit()
         print("User created successfully")
         
-        access_token = create_access_token(identity=user.id)
+        # Convert user ID to string for JWT
+        access_token = create_access_token(identity=str(user.id))
         return jsonify({
             'access_token': access_token,
             'user': user.to_dict()
@@ -86,7 +87,8 @@ def login():
         user = User.query.filter_by(username=data['username']).first()
         
         if user and user.check_password(data['password']):
-            access_token = create_access_token(identity=user.id)
+            # Convert user ID to string for JWT
+            access_token = create_access_token(identity=str(user.id))
             return jsonify({
                 'access_token': access_token,
                 'user': user.to_dict()
@@ -98,3 +100,4 @@ def login():
         print(f"Error in login: {e}")
         print(traceback.format_exc())
         return jsonify({'message': 'Internal server error', 'error': str(e)}), 500
+        

@@ -14,8 +14,8 @@ def jwt_required_custom(f):
             print(f"Authorization header: {auth_header}")
             
             verify_jwt_in_request()
-            user_id = get_jwt_identity()
-            print(f"JWT verified successfully for user ID: {user_id}")
+            user_id_str = get_jwt_identity()
+            print(f"JWT verified successfully for user ID: {user_id_str}")
             return f(*args, **kwargs)
         except Exception as e:
             print(f"JWT verification failed: {e}")
@@ -24,7 +24,14 @@ def jwt_required_custom(f):
 
 def get_current_user():
     try:
-        user_id = get_jwt_identity()
+        user_id_str = get_jwt_identity()
+        # Convert string back to integer for database query
+        user_id = int(user_id_str)
         return User.query.get(user_id)
-    except Exception as e:
+    except (ValueError, TypeError, AttributeError) as e:
+        print(f"Error converting user ID: {e}")
         return None
+    except Exception as e:
+        print(f"Error getting current user: {e}")
+        return None
+        
