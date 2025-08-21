@@ -1,8 +1,11 @@
 // frontend/src/utils/api.js
 import axios from 'axios';
 
-// Use /api prefix for production, full URL for development
-const API_BASE_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '/api' : 'http://localhost:5000');
+// Updated API configuration
+const API_BASE_URL = import.meta.env.VITE_API_URL || 
+  (import.meta.env.PROD 
+    ? 'https://event-planner-12zi.onrender.com/api' 
+    : 'http://localhost:5000');
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -32,10 +35,19 @@ api.interceptors.response.use(
       message: error.response?.data?.message || error.message,
       data: error.response?.data
     });
+    
+    // Auto-logout on 401 errors
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.location.href = '/login';
+    }
+    
     return Promise.reject(error);
   }
 );
 
+// Rest of your API exports remain the same
 export const authAPI = {
   login: (credentials) => api.post('/auth/login', credentials),
   register: (userData) => api.post('/auth/register', userData),
