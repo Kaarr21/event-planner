@@ -26,6 +26,7 @@ def create_app():
     from app.routes.rsvps import rsvps_bp
     from app.routes.invites import invites_bp
     from app.routes.profile import profile_bp
+    from app.routes.ai import ai_bp
     
     # Register API blueprints with /api prefix
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
@@ -34,6 +35,7 @@ def create_app():
     app.register_blueprint(rsvps_bp, url_prefix='/api/rsvps')
     app.register_blueprint(invites_bp, url_prefix='/api/invites')
     app.register_blueprint(profile_bp, url_prefix='/api/profile')
+    app.register_blueprint(ai_bp, url_prefix='/api/ai')
     
     # Health check endpoint
     @app.route('/api/health')

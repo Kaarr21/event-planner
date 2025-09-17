@@ -7,3 +7,5 @@ python-dotenv
 Werkzeug
 gunicorn
 psycopg[binary]
+requests==2.32.3
+
